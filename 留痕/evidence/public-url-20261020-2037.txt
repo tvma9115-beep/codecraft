@@ -1,0 +1,18 @@
+﻿URL        : http://121.36.108.46/
+checked_at : 2026-10-20 20:37:04 (UTC+8)
+server     : ECS dcad3551-7743-4abd-9043-e51b8acb44a2  (cn-north-4, c6.large.2, Ubuntu 22.04)
+eip        : 87865d73-b3dc-4d6d-b9c7-c01c0d1612ec  (1 Mbps)
+
+=== curl -I ===
+HTTP/1.1 200 OK
+Server: nginx/1.18.0 (Ubuntu)
+Date: Tue, 20 Oct 2026 12:37:04 GMT
+Content-Type: text/html
+Content-Length: 52
+Last-Modified: Tue, 20 Oct 2026 11:50:53 GMT
+Connection: keep-alive
+ETag: "6ad7559d-34"
+Accept-Ranges: bytes
+
+=== body ===
+<h1>CodeCraft</h1><p>platform online - nginx ok</p>

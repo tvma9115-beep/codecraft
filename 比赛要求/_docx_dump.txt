@@ -1,0 +1,275 @@
+[P1][Normal (Web)] 我认为这个想法值得认真做，而且它可以不只是一个编程教学 App，而是一个全新的可视化编程学习与 AI 辅助开发平台。
+[P2][Normal (Web)] 你想解决的核心问题，其实不是初学者不会写代码，而是：
+[P4][Normal (Web)] 学过语法，却不知道什么时候使用。
+[P7][Normal (Web)] 知道函数名称，却不知道参数应该怎么填。
+[P10][Normal (Web)] 知道有各种库，却不知道如何安装、调用和组合。
+[P13][Normal (Web)] 能看懂单独的代码片段，却无法把它们组织成完整程序。
+[P16][Normal (Web)] 使用 AI 编程工具时，AI 生成了代码，但自己不理解代码为什么这样写。
+[P18][Normal (Web)] 因此，我建议把产品设计成：
+[P19][Heading 1] 「CodeCraft」——AI 积木式编程学习平台
+[P20][Normal (Web)] 暂定名称 · 可视化编程组件 + AI讲师 + 实时代码生成与运行
+[P21][Normal (Web)] 核心理念是：
+[P22][Normal (Web)] 把代码拆成可以理解、可以组合、可以调试、可以复用的组件，让初学者先搭建程序，再逐步理解程序，最终独立写出代码。
+[P26][Normal] 9
+[P27][Normal (Web)] 上面的图片仅用于参考产品视觉方向。真正的产品可以结合节点式编辑器、代码编辑器和 AI 教学面板，而不是简单复刻 Scratch。
+[P28][Heading 1] 一、产品应该长什么样？
+[P29][Normal (Web)] 我建议采用一个核心工作台，分成四个区域。
+[P30][Heading 2] CodeCraft 工作台
+[P31][Normal (Web)] 项目：我的第一个 Python 程序
+[P32][Normal] 学习模式
+[P33][Heading 3] ① 组件库
+[P34][Normal (Web)] 变量组件
+[P35][Normal (Web)] 保存数据
+[P36][Normal (Web)] 条件判断
+[P37][Normal (Web)] if / else
+[P38][Normal (Web)] 循环组件
+[P39][Normal (Web)] for / while
+[P40][Normal (Web)] 库与函数
+[P41][Normal (Web)] 调用现成能力
+[P42][Heading 3] ② 积木组装区
+[P43][Normal (Web)] 开始程序
+[P44][Normal (Web)] 创建变量：score = 85
+[P45][Normal (Web)] 判断：score ≥ 60？
+[P46][Normal (Web)] 是 → 输出及格
+[P47][Normal (Web)] 否 → 输出不及格
+[P48][Normal (Web)] ③ AI讲师
+[P49][Normal (Web)] 当前组件：条件判断
+[P50][Normal (Web)] 当条件结果为真时执行第一条分支，否则执行另一条分支。它适合成绩判断、权限验证和异常处理。
+[P51][Normal (Web)] 可继续提问：为什么需要 else？如果分数是 60 呢？
+[P52][Normal (Web)] ④ 自动生成代码
+[P53][Normal (Web)] 根据积木结构生成对应的 Python 源代码。
+[P54][Normal (Web)] 这就是整个产品最核心的交互方式：拖入组件、连接逻辑、配置参数、查看解释、生成代码、运行验证。
+[P55][Normal (Web)] 需要强调，以上是交互概念示意。实际开发时，积木编辑器、代码编辑器和运行环境都需要真正实现，不能只做成静态页面。
+[P56][Heading 1] 二、最重要的产品设计：不要把所有代码都做成积木
+[P57][Normal (Web)] 这是整个项目成败的关键。
+[P58][Normal (Web)] 如果你把每一行代码都设计成一个积木，组件会越来越多，用户也会越来越难找到需要的东西。
+[P59][Normal (Web)] 我建议采用三级结构。
+[P61][Normal (Web)] 第一级：基础语法积木
+[P62][Normal (Web)] 适合完全零基础的人。
+[P63][Normal (Web)] 变量、数据类型、判断、循环、运算、输入输出、函数定义。
+[P65][Normal (Web)] 第二级：函数与库组件
+[P66][Normal (Web)] 从基础语法过渡到真正的软件开发。
+[P67][Normal (Web)] 函数调用、参数配置、返回值、模块导入、第三方库、文件读写、网络和数据处理。
+[P68][Normal (Web)] 第三级：项目功能模块
+[P69][Normal (Web)] 让用户组合真正的软件功能。
+[P70][Normal (Web)] 例如文件批量重命名、图片压缩、网页数据可视化、小游戏、简单 AI 图像分类应用。
+[P71][Normal (Web)] 这三级分别解决三个问题：
+[P73][Normal (Web)] 我不懂语法：通过基础积木学习。
+[P76][Normal (Web)] 我不会用库和函数：通过参数化组件学习。
+[P79][Normal (Web)] 我不会做项目：通过完整功能模块进行组装。
+[P81][Heading 1] 三、核心功能应该怎么设计？
+[P82][Normal (Web)] 我建议将产品拆成六个模块。
+[TABLE83] rows=7 cols=3
+    R0: 模块 || 具体功能 || 解决的问题
+    R1: 积木编程工作台 || 拖拽、连接、配置参数、嵌套逻辑 || 不知道代码如何组合
+    R2: AI讲师 || 讲解功能、参数、场景、错误原因 || 不理解代码含义
+    R3: 代码转换器 || 积木转代码、代码映射回积木 || 不知道积木对应什么语法
+    R4: 本地运行与调试 || 运行程序、查看输出、定位错误 || 只会写，不会验证
+    R5: 组件知识库 || 按语言、功能、库、参数搜索 || 不熟悉库和函数
+    R6: 学习路径系统 || 任务、练习、知识点和项目解锁 || 学完就忘，不会迁移
+[P84][Normal (Web)] 其中最重要的不是 AI 聊天，而是前面四项能够组成完整闭环。
+[P85][Heading 2] 1. 积木和代码必须双向联动
+[P86][Normal (Web)] 假设用户搭建：
+[P88][Normal (Web)] 创建变量 score
+[P91][Normal (Web)] 将它赋值为 85
+[P94][Normal (Web)] 判断它是否大于等于 60
+[P97][Normal (Web)] 根据结果输出不同文本
+[P99][Normal (Web)] 程序应当自动生成：
+[P100][HTML Preformatted] score = 85if score >= 60:    print("及格")else:    print("不及格")
+[P101][Normal (Web)] 如果用户在代码编辑器里把 85 改为 45，系统应当尽可能同步更新积木。
+[P102][Normal (Web)] 但要注意：任意代码不一定都能无损转换为积木。 因此，第一版应优先支持自己定义的组件集合和受控的 Python 语法子集，遇到无法识别的代码时保留原代码，并提示哪些部分暂不支持转换。
+[P103][Heading 2] 2. 每个组件都有独立的讲解卡片
+[P104][Normal (Web)] 例如用户点击 print()，不是只显示一句“输出函数”，而是显示：
+[TABLE105] rows=10 cols=2
+    R0: 讲解项 || 内容
+    R1: 名称 || print()
+    R2: 功能 || 把指定内容输出到标准输出
+    R3: 参数 || *objects、sep、end 等
+    R4: 输入 || 字符串、数字、变量等
+    R5: 输出 || 文本输出；返回值为 None
+    R6: 使用场景 || 调试、显示计算结果、交互提示
+    R7: 常见错误 || 忘记括号、字符串引号不匹配
+    R8: 组合示例 || 变量 → 运算 → print()
+    R9: 练习 || 修改参数，让多个变量用逗号分隔输出
+[P106][Normal (Web)] 这套讲解数据应当由你自己设计的组件知识库提供，而不是每次都让 AI 临时猜测函数的作用。
+[P107][Heading 1] 四、AI讲师如何实现？可以不依赖 API
+[P108][Normal (Web)] 我建议把 AI 讲师拆成三层，既节省成本，也能确保讲解可靠。
+[P109][Normal (Web)] 第一层：本地知识库
+[P110][Normal] 必做
+[P111][Normal (Web)] 每个组件预先配置功能、参数、示例、常见错误和适用场景。即使完全断网，也能进行基础讲解。
+[P112][Normal (Web)] 第二层：规则式教学引擎
+[P113][Normal] 必做
+[P114][Normal (Web)] 根据用户的代码结构和错误类型，自动生成针对性讲解。例如发现变量尚未定义，就提示变量定义与作用域知识。
+[P115][Normal (Web)] 第三层：本地大模型（可选）
+[P116][Normal (Web)] 使用可在本地运行的开源代码模型，提供更灵活的问答、代码解释和练习生成。具体能否流畅运行取决于模型规模、手机内存和设备性能。
+[P117][Normal (Web)] 这样即使没有模型、没有网络，前两层依然可以工作。后续也可以允许用户自行配置兼容的外部模型，但这不应当成为核心功能的前提。
+[P118][Heading 1] 五、组件系统应该如何设计？
+[P119][Normal (Web)] 这是整个项目最有技术含量的部分之一。
+[P120][Normal (Web)] 不要把积木仅仅理解为一张彩色卡片。每个积木都应该是一个有明确规则的可执行组件。
+[P121][Normal (Web)] 建议每个组件包含以下字段：
+[TABLE122] rows=15 cols=2
+    R0: 字段 || 示例
+    R1: id || python.print
+    R2: name || 输出文本
+    R3: language || Python
+    R4: category || 输入输出
+    R5: inputs || 待输出的表达式
+    R6: parameters || sep、end
+    R7: outputType || 无返回值
+    R8: codeTemplate || print({value})
+    R9: description || 功能说明
+    R10: useCases || 调试、显示结果
+    R11: examples || 可运行的示例
+    R12: errorHints || 参数错误提示
+    R13: difficulty || 入门
+    R14: version || 组件版本
+[P123][Normal (Web)] 例如：
+[P124][HTML Preformatted] {
+[P125][HTML Preformatted] "id": "python.print",
+[P126][HTML Preformatted] "name": "输出文本",
+[P127][HTML Preformatted] "language": "python",
+[P128][HTML Preformatted] "category": "input_output",
+[P129][HTML Preformatted] "inputs": {
+[P130][HTML Preformatted] "value": {
+[P131][HTML Preformatted] "type": "expression",
+[P132][HTML Preformatted] "required": true
+[P133][HTML Preformatted] }
+[P134][HTML Preformatted] },
+[P135][HTML Preformatted] "codeTemplate": "print({value})",
+[P136][HTML Preformatted] "description": "将指定内容输出到标准输出",
+[P137][HTML Preformatted] "difficulty": "beginner"
+[P138][HTML Preformatted] }
+[P139][Normal (Web)] 这只是简化示例。真正的组件定义还应当包括类型检查、输入输出端口、参数约束、代码生成规则、教学内容和测试用例。
+[P140][Normal (Web)] 有了这套规范，你才能持续添加新语言、新函数、新库，而不用推翻整个程序。
+[P141][Heading 1] 六、技术选型：怎样把它真正开发出来？
+[P142][Normal (Web)] 我建议第一版优先做成 Web 技术驱动的跨平台 App。这样既能在电脑上学习，也能在 Android 手机上使用，后续还可以评估鸿蒙适配方案。
+[TABLE143] rows=12 cols=3
+    R0: 技术 || 用途 || 是否必须
+    R1: TypeScript || 核心业务逻辑 || 是
+    R2: React || 前端界面 || 是
+    R3: React Flow || 节点连接式工作流编辑 || 推荐
+    R4: Blockly || 语法积木编辑器 || 推荐
+    R5: Monaco Editor || 代码编辑器 || 推荐
+    R6: Python AST || 解析 Python 代码结构 || Python 双向转换时需要
+    R7: FastAPI || 可选的本地/远程服务层 || 初期可不需要
+    R8: SQLite / IndexedDB || 保存项目、设置、学习进度 || 是，至少需要一种
+    R9: Pyodide 或安全的 Python 执行环境 || 在浏览器中执行部分 Python 程序 || 需要
+    R10: 本地规则引擎 || 代码诊断和教学 || 是
+    R11: 本地模型运行框架 || 可选的离线大模型 || 后期再做
+[P144][Normal (Web)] 这里有个关键区别：
+[P146][Normal (Web)] Blockly 更适合学习语法、拖拽和嵌套控制结构。
+[P149][Normal (Web)] React Flow 更适合将函数、API、业务步骤组成节点工作流。
+[P152][Normal (Web)] Monaco Editor 适合提供真正的代码编辑体验。
+[P154][Normal (Web)] 三者不需要第一版全部同时上。我的建议是先用 Blockly 实现 Python 基础语法积木，再用 Monaco 展示生成的代码；等基础闭环完成后，再考虑 React Flow 形式的高级模块工作流。
+[P155][Heading 1] 七、完整开发路线：从零到可演示 App
+[P156][Normal (Web)] 建议分成六个阶段，不要一次性让 AI 编程工具生成所有功能。
+[P158][Normal (Web)] 阶段 1：实现最小积木编辑器
+[P161][Normal (Web)] 选择 Python 作为第一门语言。
+[P164][Normal (Web)] 实现变量、运算、输出、条件、循环。
+[P167][Normal (Web)] 拖拽积木后可以形成完整程序。
+[P170][Normal (Web)] 自动生成 Python 代码。
+[P172][Normal (Web)] 验收标准：用户不手写代码，也能组装并生成一个成绩判断程序。
+[P174][Normal (Web)] 阶段 2：加入实时代码和运行结果
+[P177][Normal (Web)] 左侧是积木区，右侧是代码区。
+[P180][Normal (Web)] 下方显示输出结果。
+[P183][Normal (Web)] 修改积木后自动更新代码。
+[P186][Normal (Web)] 为程序运行增加超时和资源限制。
+[P188][Normal (Web)] 验收标准：组装程序 → 生成代码 → 运行 → 看到正确输出。
+[P190][Normal (Web)] 阶段 3：构建组件知识库
+[P193][Normal (Web)] 每个组件有独立说明。
+[P196][Normal (Web)] 展示参数、输入输出、场景和示例。
+[P199][Normal (Web)] 点击代码中的函数，可以跳转到对应知识卡片。
+[P202][Normal (Web)] 为常见错误提供提示。
+[P204][Normal (Web)] 验收标准：用户点击一个组件，可以理解它的功能并看到一个可运行的示例。
+[P206][Normal (Web)] 阶段 4：开发 AI 讲师
+[P209][Normal (Web)] 根据用户当前使用的组件生成讲解。
+[P212][Normal (Web)] 结合报错信息提供分步排查。
+[P215][Normal (Web)] 提供提示式教学，而不是直接把答案全部给出。
+[P218][Normal (Web)] 增加学习任务和针对性练习。
+[P220][Normal (Web)] 验收标准：当用户出现常见错误时，系统能解释原因、指出相关知识点并给出修正建议。
+[P222][Normal (Web)] 阶段 5：升级到函数与第三方库
+[P225][Normal (Web)] 加入函数定义和调用。
+[P228][Normal (Web)] 为标准库设计组件。
+[P231][Normal (Web)] 增加受控的第三方库组件。
+[P234][Normal (Web)] 为每个组件添加依赖说明和版本信息。
+[P236][Normal (Web)] 验收标准：能够组合多个函数和受支持的库，完成一个有实际用途的小项目。
+[P238][Normal (Web)] 阶段 6：打包成手机 App
+[P241][Normal (Web)] 优先验证 Android 适配。
+[P244][Normal (Web)] 处理手机端触摸拖拽、横竖屏和键盘布局。
+[P247][Normal (Web)] 支持项目保存、恢复和导出。
+[P250][Normal (Web)] 最后再评估 HarmonyOS 原生版本或适配。
+[P252][Normal (Web)] 验收标准：手机上可以创建项目、组装程序、学习讲解、运行受支持的代码，并在断网时使用核心教学功能。
+[P253][Heading 1] 八、手机 App 和电脑端应该有什么区别？
+[P254][Normal (Web)] 我不建议把电脑端界面简单缩小后放到手机上。
+[P256][Normal (Web)] 手机端
+[P258][Normal (Web)] 单次专注一个积木
+[P261][Normal (Web)] 点击添加与连接
+[P264][Normal (Web)] 讲师卡片优先
+[P267][Normal (Web)] 运行结果和错误提示
+[P270][Normal (Web)] 适合碎片化学习
+[P273][Normal (Web)] 电脑端
+[P275][Normal (Web)] 完整节点工作区
+[P278][Normal (Web)] 积木与代码双栏
+[P281][Normal (Web)] 多模块连接
+[P284][Normal (Web)] 调试和日志
+[P287][Normal (Web)] 适合项目开发
+[P289][Normal (Web)] 可以采用同一套 TypeScript 业务逻辑和组件定义，针对不同屏幕设计不同布局。
+[P290][Heading 1] 九、怎么保证不依赖 API，也不让用户的代码出现安全问题？
+[P291][Normal (Web)] 这是必须提前设计的。
+[P292][Heading 2] 离线运行方案
+[P293][Normal (Web)] 第一版可以把以下内容全部放在客户端：
+[P295][Normal (Web)] 组件知识库。
+[P298][Normal (Web)] 积木到代码的转换规则。
+[P301][Normal (Web)] 常见错误诊断规则。
+[P304][Normal (Web)] 示例程序与练习。
+[P307][Normal (Web)] 用户项目和学习进度。
+[P310][Normal (Web)] 受支持的本地 Python 运行环境。
+[P312][Normal (Web)] AI 讲师初期使用知识库与规则引擎即可，不需要调用任何外部 API。
+[P313][Heading 2] 代码执行安全
+[P314][Normal (Web)] 让用户写的程序直接在 App 主进程中运行是危险的。代码可能死循环、占用大量内存，甚至尝试访问本地文件。
+[P315][Normal (Web)] 因此需要：
+[P317][Normal (Web)] 对执行时间设置上限。
+[P320][Normal (Web)] 限制可用模块和系统调用。
+[P323][Normal (Web)] 限制文件、网络和系统权限。
+[P326][Normal (Web)] 对执行环境进行隔离。
+[P329][Normal (Web)] 不允许用户代码直接访问应用内部敏感数据。
+[P331][Normal (Web)] Pyodide 等浏览器运行环境可以帮助你在客户端执行部分 Python 代码，但它并不自动等于完整安全沙箱。若后续支持任意第三方库、系统命令或其他语言，需要进一步设计隔离环境。
+[P332][Heading 1] 十、这个项目真正值得做的创新是什么？
+[P333][Normal (Web)] 我认为不是“把代码做成积木”本身，而是下面三个结合点。
+[P334][Normal (Web)] 创新点 1：积木、代码、知识点三者联动
+[P335][Normal (Web)] 用户拖动一个组件，代码自动更新，讲师同步解释。点击代码中的语法，也能反向找到对应积木和教学内容。
+[P336][Normal (Web)] 创新点 2：函数和库的可视化接口
+[P337][Normal (Web)] 将函数封装成有输入、输出、参数和类型约束的模块。用户不仅知道怎么调用，还能知道它为什么能和其他组件连接。
+[P338][Normal (Web)] 创新点 3：基于程序结构的个性化教学
+[P339][Normal (Web)] 系统不只是回答问题，而是根据用户的程序结构、错误和学习进度，解释真正需要掌握的知识点。
+[P340][Normal (Web)] 这三个功能结合起来，才能真正区别于普通积木编程工具、代码编辑器和 AI 聊天机器人。
+[P341][Heading 1] 十一、我建议你第一版具体做什么？
+[P342][Normal (Web)] 不要一开始就支持 Python、C++、Java、JavaScript、Kotlin 等所有语言，也不要试图把所有第三方库都做成积木。
+[P343][Normal (Web)] 建议第一个版本只实现：
+[TABLE344] rows=12 cols=3
+    R0: 优先级 || 功能 || 第一版范围
+    R1: P0 || Python 基础积木 || 变量、运算、输出、条件、循环
+    R2: P0 || 代码生成 || 积木生成可运行代码
+    R3: P0 || 程序执行 || 运行并显示结果
+    R4: P0 || 组件讲解 || 功能、参数、示例、场景
+    R5: P0 || 错误提示 || 语法错误与基础规则诊断
+    R6: P1 || 函数组件 || 函数定义、调用和返回值
+    R7: P1 || 学习任务 || 闯关式练习
+    R8: P1 || 项目保存 || 本地保存和导出
+    R9: P2 || 第三方库组件 || 先选少量有代表性的库
+    R10: P2 || 本地大模型 || 设备允许时增加
+    R11: P3 || 多语言支持 || 根据第一版反馈扩展
+[P345][Normal (Web)] 第一个可演示项目，可以选“成绩判断器”或“简易计算器”。等积木到代码、代码到运行结果、运行错误到教学解释这条链完整后，再扩展到真正的项目模块。
+[P346][Normal (Web)] 最终建议：先做一个以 Python 为核心、完全可以离线使用的 Web 技术 App 原型。 先把积木编程、代码生成、运行和讲解这四项做扎实，再逐步扩展成跨语言的 AI 编程学习平台。这样既有可落地性，也更容易展示你们自己的技术创新。
+
+=== MEDIA ===
+word/media/  0 bytes
+word/media/image1.jpeg  55542 bytes
+word/media/image2.jpeg  99289 bytes
+word/media/image3.jpeg  83637 bytes
+word/media/image4.jpeg  30589 bytes
+word/media/image5.jpeg  46092 bytes
+word/media/image6.jpeg  135816 bytes
+word/media/image7.jpeg  111254 bytes
+
+total paragraphs+blocks: 347
