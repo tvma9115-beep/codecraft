@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>待办清单</title>
+<style>
+/* ===== 待办清单 · 内联样式（单文件交付，无外部资源） ===== */
+:root {
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-soft: #eff6ff;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --danger-soft: #fef2f2;
+  --text: #1f2937;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app { max-width: 860px; margin: 0 auto; padding: 32px 24px 60px; }
+
+.app-header { text-align: center; margin-bottom: 24px; }
+.app-title { font-size: 28px; font-weight: 600; color: var(--text); }
+.app-subtitle { margin-top: 6px; color: var(--text-secondary); font-size: 14px; }
+
+.add-panel {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+.add-row { display: flex; gap: 12px; }
+.add-row-detail { margin-top: 12px; flex-wrap: wrap; }
+.input-title { flex: 1; }
+
+input[type="text"],
+input[type="date"],
+select,
+textarea {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--card-bg);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.input-desc { flex: 1; min-width: 180px; }
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.05s, box-shadow 0.15s;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-hover); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35); }
+.btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--bg); color: var(--text); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: var(--danger-hover); }
+
+.form-error { color: var(--danger); font-size: 13px; margin-top: 8px; min-height: 0; }
+
+.stats-bar { display: flex; justify-content: center; gap: 48px; margin: 20px 0 12px; }
+.stat-item { display: flex; flex-direction: column; align-items: center; }
+.stat-num { font-size: 26px; font-weight: 600; color: var(--text); }
+.stat-label { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+.filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-tabs { display: flex; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.filter-tab { border: none; background: transparent; padding: 8px 18px; font-size: 14px; cursor: pointer; color: var(--text-secondary); transition: background 0.15s, color 0.15s; }
+.filter-tab.active { background: var(--primary-soft); color: var(--primary); font-weight: 500; }
+.filter-tab:hover:not(.active) { background: var(--bg); color: var(--text); }
+.search-input { flex: 1; min-width: 160px; }
+
+.todo-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.todo-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s, border-color 0.15s;
+  overflow: hidden;
+}
+.todo-item:hover { box-shadow: var(--shadow-lg); border-color: #d1d5db; }
+.todo-item::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: transparent; }
+.todo-item.priority-low::before { background: #10b981; }
+.todo-item.priority-medium::before { background: #f59e0b; }
+.todo-item.priority-high::before { background: #ef4444; }
+.todo-item.completed { opacity: 0.62; }
+.todo-item.completed .todo-title { text-decoration: line-through; color: var(--text-secondary); }
+
+.todo-main { flex: 1; min-width: 0; }
+.todo-title { font-size: 15px; font-weight: 500; word-break: break-word; white-space: pre-wrap; }
+.todo-desc {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.todo-meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+.badge.priority { background: var(--primary-soft); color: var(--primary); border-color: transparent; }
+.badge.due-overdue { background: var(--danger-soft); color: var(--danger); }
+
+.todo-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.btn-icon { background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 13px; cursor: pointer; color: var(--text-secondary); transition: background 0.15s, color 0.15s; }
+.btn-icon:hover { background: var(--bg); color: var(--text); }
+.btn-icon.complete:hover { background: var(--primary-soft); color: var(--primary); border-color: var(--primary); }
+.btn-icon.delete:hover { background: var(--danger-soft); color: var(--danger); border-color: var(--danger); }
+
+.list-status { text-align: center; color: var(--text-secondary); font-size: 14px; padding: 40px 0; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+.modal-overlay.hidden { display: none; }
+.modal { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 480px; padding: 20px; box-shadow: var(--shadow-lg); }
+.modal-sm { max-width: 360px; }
+.modal-title { font-size: 17px; margin-bottom: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; flex: 1; }
+.field label { font-size: 13px; color: var(--text-secondary); }
+.field textarea { resize: vertical; min-height: 60px; }
+.field-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.modal-message { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  animation: toast-in 0.2s ease;
+}
+.toast.hidden { display: none; }
+.toast.error { background: var(--danger); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@media (max-width: 640px) {
+  .app { padding: 20px 12px 48px; }
+  .stats-bar { gap: 28px; }
+  .add-row { flex-direction: column; }
+  .filter-bar { flex-direction: column; align-items: stretch; }
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="app-header">
+    <h1 class="app-title">待办清单</h1>
+    <p class="app-subtitle">专注当下，高效完成每一件小事</p>
+  </header>
+
+  <section class="add-panel" aria-label="新增任务">
+    <div class="add-row">
+      <label class="sr-only" for="input-title">任务标题</label>
+      <input type="text" id="input-title" class="input-title" placeholder="要做什么？按回车快速添加" maxlength="100" autocomplete="off">
+      <button id="btn-add" class="btn btn-primary" type="button">新增</button>
+    </div>
+    <div class="add-row add-row-detail">
+      <label class="sr-only" for="input-desc">任务备注</label>
+      <input type="text" id="input-desc" class="input-desc" placeholder="备注（可选，最多500字）" maxlength="500" autocomplete="off">
+      <label class="sr-only" for="input-due">截止日期</label>
+      <input type="date" id="input-due" class="input-due">
+      <label class="sr-only" for="input-priority">优先级</label>
+      <select id="input-priority" class="input-priority">
+        <option value="none">优先级：无</option>
+        <option value="low">优先级：低</option>
+        <option value="medium">优先级：中</option>
+        <option value="high">优先级：高</option>
+      </select>
+    </div>
+    <p id="add-error" class="form-error" role="alert"></p>
+  </section>
+
+  <section class="stats-bar" aria-label="任务统计">
+    <div class="stat-item"><span id="stat-total" class="stat-num">0</span><span class="stat-label">全部</span></div>
+    <div class="stat-item"><span id="stat-active" class="stat-num">0</span><span class="stat-label">进行中</span></div>
+    <div class="stat-item"><span id="stat-completed" class="stat-num">0</span><span class="stat-label">已完成</span></div>
+  </section>
+
+  <section class="filter-bar" aria-label="筛选与搜索">
+    <div class="filter-tabs" role="tablist" aria-label="状态筛选">
+      <button class="filter-tab active" data-status="all" role="tab" aria-selected="true">全部</button>
+      <button class="filter-tab" data-status="active" role="tab" aria-selected="false">进行中</button>
+      <button class="filter-tab" data-status="completed" role="tab" aria-selected="false">已完成</button>
+    </div>
+    <label class="sr-only" for="search-input">搜索任务</label>
+    <input type="text" id="search-input" class="search-input" placeholder="搜索标题或备注" autocomplete="off">
+    <button id="btn-clear" class="btn btn-ghost" type="button" title="清除所有已完成任务">清除已完成</button>
+  </section>
+
+  <ul id="todo-list" class="todo-list" aria-label="任务列表"></ul>
+  <p id="list-status" class="list-status" role="status"></p>
+
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" role="dialog" aria-modal="true">
+      <h2 class="modal-title">编辑任务</h2>
+      <div class="modal-body">
+        <div class="field">
+          <label for="edit-title">标题</label>
+          <input type="text" id="edit-title" maxlength="100">
+          <p class="form-error" id="edit-title-error"></p>
+        </div>
+        <div class="field">
+          <label for="edit-desc">备注</label>
+          <textarea id="edit-desc" rows="3" maxlength="500"></textarea>
+          <p class="form-error" id="edit-desc-error"></p>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="edit-due">截止日期</label>
+            <input type="date" id="edit-due">
+            <p class="form-error" id="edit-due-error"></p>
+          </div>
+          <div class="field">
+            <label for="edit-priority">优先级</label>
+            <select id="edit-priority">
+              <option value="none">无</option>
+              <option value="low">低</option>
+              <option value="medium">中</option>
+              <option value="high">高</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="btn-modal-cancel" class="btn btn-ghost" type="button">取消</button>
+        <button id="btn-modal-save" class="btn btn-primary" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirm-overlay" class="modal-overlay hidden">
+    <div class="modal modal-sm" role="dialog" aria-modal="true">
+      <h2 class="modal-title">确认操作</h2>
+      <p id="confirm-message" class="modal-message"></p>
+      <div class="modal-actions">
+        <button id="btn-confirm-cancel" class="btn btn-ghost" type="button">取消</button>
+        <button id="btn-confirm-ok" class="btn btn-danger" type="button">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+</main>
+
+<script>
+"use strict";
+/* ===== 待办清单 · 内联脚本（单文件交付，无外部依赖） =====
+ * 模块划分：CONFIG → TodoStore → ValidationService → TodoService → UIController
+ */
+
+/* ---------- 配置与类型契约 ---------- */
+/**
+ * @typedef {"active" | "completed"} TodoStatus
+ * @typedef {"none" | "low" | "medium" | "high"} PriorityLevel
+ * @typedef {{code: string, message: string}} AppError
+ * @typedef {Object} Todo
+ * @property {string} id
+ * @property {string} title
+ * @property {string} description
+ * @property {TodoStatus} status
+ * @property {PriorityLevel} priority
+ * @property {string|null} dueDate
+ * @property {string} createdAt
+ * @property {string|null} completedAt
+ */
+
+const CONFIG = {
+  STORAGE_KEY: "todolist_web.todos",
+  SCHEMA_VERSION: 1,
+  DEBOUNCE_MS: 200,
+  PRIORITY_WEIGHT: { none: 0, low: 1, medium: 2, high: 3 },
+  VALID_PRIORITIES: ["none", "low", "medium", "high"],
+  VALID_STATUSES: ["active", "completed"],
+  DEFAULT_SORT: "default",
+};
+
+const PRIORITY_LABEL = { none: "无", low: "低", medium: "中", high: "高" };
+const STATUS_LABEL = { active: "进行中", completed: "已完成" };
+
+/* ---------- 模块①：TodoStore（本地持久化） ---------- */
+const TodoStore = {
+  todos: [],
+
+  /** 启动加载：解析 localStorage，脏数据容错 */
+  load() {
+    this.todos = [];
+    try {
+      const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const arr = Array.isArray(parsed) ? parsed : parsed.todos;
+      if (!Array.isArray(arr)) return;
+      this.todos = arr
+        .filter((t) => t && typeof t === "object")
+        .map((t) => this._normalize(t));
+    } catch (_e) {
+      this.todos = [];
+    }
+  },
+
+  /** 字段缺失补齐默认值，保证历史脏数据零报错 */
+  _normalize(t) {
+    return {
+      id: typeof t.id === "string" ? t.id : this.genId(),
+      title: typeof t.title === "string" ? t.title : "",
+      description: typeof t.description === "string" ? t.description : "",
+      status: CONFIG.VALID_STATUSES.includes(t.status) ? t.status : "active",
+      priority: CONFIG.VALID_PRIORITIES.includes(t.priority) ? t.priority : "none",
+      dueDate: typeof t.dueDate === "string" ? t.dueDate : null,
+      createdAt: typeof t.createdAt === "string" ? t.createdAt : new Date().toISOString(),
+      completedAt: typeof t.completedAt === "string" ? t.completedAt : null,
+    };
+  },
+
+  /** 序列化内存态并写入 localStorage（原子），失败向上抛出 */
+  save() {
+    const payload = JSON.stringify({
+      schemaVersion: CONFIG.SCHEMA_VERSION,
+      todos: this.todos,
+    });
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEY, payload);
+    } catch (_e) {
+      throw new Error("QUOTA_EXCEEDED");
+    }
+  },
+
+  /** 生成唯一 ID：crypto.randomUUID 优先，file:// 场景降级 */
+  genId() {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    return Date.now().toString(36) + "-" + Math.random().toString(36).slice(2);
+  },
+
+  /** 注册跨标签页同步回调 */
+  onExternalChange(cb) {
+    window.addEventListener("storage", (e) => {
+      if (e.key === null || e.key === CONFIG.STORAGE_KEY) {
+        this.load();
+        cb();
+      }
+    });
+  },
+};
+
+/* ---------- 模块②：ValidationService（输入校验） ---------- */
+const ValidationService = {
+  /**
+   * 按固定顺序返回首个非法项错误对象，全部通过返回 null
+   * @param {object} input - {title, description, dueDate, priority}
+   * @returns {AppError|null}
+   */
+  validate(input) {
+    const title = (input && input.title) || "";
+    if (!title.trim()) return { code: "40001", message: "请输入任务标题" };
+    if (title.length > 100) return { code: "40002", message: "标题长度不能超过100个字符" };
+
+    const desc = input.description || "";
+    if (desc.length > 500) return { code: "40003", message: "备注长度不能超过500个字符" };
+
+    const dueDate = input.dueDate;
+    if (dueDate) {
+      if (dueDate < ValidationService._today()) {
+        return { code: "40004", message: "截止日期不能早于今天" };
+      }
+    }
+
+    const priority = input.priority || "none";
+    if (!CONFIG.VALID_PRIORITIES.includes(priority)) {
+      return { code: "40005", message: "优先级取值不合法" };
+    }
+    return null;
+  },
+
+  validateStatus(status) {
+    if (!CONFIG.VALID_STATUSES.includes(status)) {
+      return { code: "40006", message: "状态取值不合法" };
+    }
+    return null;
+  },
+
+  validateSort(sort) {
+    if (sort !== "default" && sort !== "smart") {
+      return { code: "40005", message: "排序取值不合法" };
+    }
+    return null;
+  },
+
+  _today() {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${d.getFullYear()}-${m}-${day}`;
+  },
+};
+
+/* ---------- 模块③：TodoService（业务编排） ---------- */
+const TodoService = {
+  /**
+   * 查询任务列表：状态筛选 + 关键字模糊匹配 + 排序
+   * @param {{status?: string, keyword?: string, sort?: string}} filter
+   */
+  listTodos(filter = {}) {
+    const status = filter.status || "all";
+    const keyword = (filter.keyword || "").trim().toLowerCase();
+    const sort = filter.sort || CONFIG.DEFAULT_SORT;
+
+    const statusErr = this._validateFilterStatus(status);
+    if (statusErr) return statusErr;
+    const sortErr = ValidationService.validateSort(sort);
+    if (sortErr) return sortErr;
+
+    let todos = TodoStore.todos.slice();
+    if (status !== "all") {
+      todos = todos.filter((t) => t.status === status);
+    }
+    if (keyword) {
+      todos = todos.filter(
+        (t) => t.title.toLowerCase().includes(keyword) || t.description.toLowerCase().includes(keyword)
+      );
+    }
+    todos = this._sortTodos(todos, sort);
+    return { todos: todos, stats: this.getStats() };
+  },
+
+  _validateFilterStatus(status) {
+    if (!["all", "active", "completed"].includes(status)) {
+      return { code: "40006", message: "状态取值不合法" };
+    }
+    return null;
+  },
+
+  /** 排序：default 按 createdAt 倒序；smart 增强排序 */
+  _sortTodos(todos, sort) {
+    if (sort === "smart") {
+      const active = todos.filter((t) => t.status === "active");
+      const completed = todos.filter((t) => t.status === "completed");
+
+      const today = ValidationService._today();
+      active.sort((a, b) => {
+        const wa = CONFIG.PRIORITY_WEIGHT[a.priority];
+        const wb = CONFIG.PRIORITY_WEIGHT[b.priority];
+        if (wa !== wb) return wb - wa;
+        const ua = this._urgency(a.dueDate, today);
+        const ub = this._urgency(b.dueDate, today);
+        if (ua !== ub) return ua - ub;
+        return b.createdAt.localeCompare(a.createdAt);
+      });
+      completed.sort((a, b) => (b.completedAt || "").localeCompare(a.completedAt || ""));
+      return active.concat(completed);
+    }
+    // default：新建置顶
+    return todos.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  },
+
+  /** 截止日期临近度：越近越优先；无日期排最后；过期立即优先 */
+  _urgency(dueDate, today) {
+    if (!dueDate) return Number.MAX_SAFE_INTEGER;
+    if (dueDate < today) return 0;
+    const d1 = new Date(dueDate).getTime();
+    const d2 = new Date(today).getTime();
+    return d1 - d2;
+  },
+
+  /** 统计 */
+  getStats() {
+    let active = 0, completed = 0;
+    for (const t of TodoStore.todos) {
+      if (t.status === "completed") completed += 1;
+      else active += 1;
+    }
+    return { total: TodoStore.todos.length, active: active, completed: completed };
+  },
+
+  /**
+   * 新增任务
+   * @returns {{todo: object, stats: object}|AppError}
+   */
+  createTodo(input) {
+    const err = ValidationService.validate(input);
+    if (err) return err;
+    const todo = {
+      id: TodoStore.genId(),
+      title: input.title,
+      description: input.description || "",
+      status: "active",
+      priority: input.priority || "none",
+      dueDate: input.dueDate || null,
+      createdAt: new Date().toISOString(),
+      completedAt: null,
+    };
+    TodoStore.todos.unshift(todo);
+    return this._persist(() => ({ todo: todo, stats: this.getStats() }), () => {
+      TodoStore.todos = TodoStore.todos.filter((t) => t.id !== todo.id);
+    });
+  },
+
+  /**
+   * 编辑任务：仅 active 可编辑；保存前重读存储防并发删改
+   * @returns {{todo: object, stats: object}|AppError}
+   */
+  updateTodo(id, input) {
+    const err = ValidationService.validate(input);
+    if (err) return err;
+
+    // 并发防护：从存储重读目标任务，避免与其他标签页冲突
+    this._reloadFromStorage();
+    const target = TodoStore.todos.find((t) => t.id === id);
+    if (!target) return { code: "40401", message: "任务已被删除，无法保存" };
+    if (target.status === "completed") {
+      return { code: "40301", message: "已完成任务不可编辑" };
+    }
+    const updated = Object.assign({}, target, {
+      title: input.title,
+      description: input.description || "",
+      priority: input.priority || "none",
+      dueDate: input.dueDate || null,
+    });
+    return this._persist(() => {
+      TodoStore.todos = TodoStore.todos.map((t) => (t.id === id ? updated : t));
+      return { todo: updated, stats: this.getStats() };
+    });
+  },
+
+  /**
+   * 状态切换：active ⟷ completed
+   * @returns {{todo: object, stats: object}|AppError}
+   */
+  toggleStatus(id, status) {
+    const statusErr = ValidationService.validateStatus(status);
+    if (statusErr) return statusErr;
+
+    this._reloadFromStorage();
+    const target = TodoStore.todos.find((t) => t.id === id);
+    if (!target) return { code: "40401", message: "任务已被删除，无法保存" };
+
+    let changed;
+    if (status === "completed" && target.status !== "completed") {
+      changed = Object.assign({}, target, { status: "completed", completedAt: new Date().toISOString() });
+    } else if (status === "active" && target.status !== "active") {
+      changed = Object.assign({}, target, { status: "active", completedAt: null });
+    } else {
+      return { todo: target, stats: this.getStats() };
+    }
+    return this._persist(() => {
+      TodoStore.todos = TodoStore.todos.map((t) => (t.id === id ? changed : t));
+      return { todo: changed, stats: this.getStats() };
+    });
+  },
+
+  /** 删除单个任务（幂等） */
+  removeTodo(id) {
+    this._reloadFromStorage();
+    const exists = TodoStore.todos.some((t) => t.id === id);
+    if (!exists) return { stats: this.getStats() };
+    return this._persist(() => {
+      TodoStore.todos = TodoStore.todos.filter((t) => t.id !== id);
+      return { stats: this.getStats() };
+    });
+  },
+
+  /** 批量清除已完成 */
+  clearCompleted() {
+    this._reloadFromStorage();
+    const before = TodoStore.todos.length;
+    return this._persist(() => {
+      TodoStore.todos = TodoStore.todos.filter((t) => t.status !== "completed");
+      const removed = before - TodoStore.todos.length;
+      return { removed: removed, stats: this.getStats() };
+    });
+  },
+
+  /** 从 localStorage 重新读取最新数据，用于并发防护与跨页同步
+   *  当存储中尚无任何数据（从未写入）时保留当前内存态 */
+  _reloadFromStorage() {
+    const backup = TodoStore.todos;
+    const raw = (() => {
+      try { return localStorage.getItem(CONFIG.STORAGE_KEY); }
+      catch (_e) { return null; }
+    })();
+    if (raw === null) return; // 从未写入，保留内存态
+    TodoStore.load();
+    if (TodoStore.todos.length === 0 && backup.length > 0) TodoStore.todos = backup;
+  },
+
+  /** 统一持久化：写盘失败回滚内存态并返回 50001 */
+  _persist(mutate, rollback) {
+    let result;
+    try {
+      result = mutate();
+      TodoStore.save();
+    } catch (_e) {
+      if (typeof rollback === "function") rollback();
+      else TodoStore.load();
+      return { code: "50001", message: "保存失败，请检查浏览器存储设置" };
+    }
+    return result;
+  },
+};
+
+/* ---------- 模块④：UIController（渲染与交互） ---------- */
+const UIController = {
+  state: { filter: "all", keyword: "", editingId: null, confirmAction: null },
+
+  els: {},
+
+  init() {
+    TodoStore.load();
+    this._cacheEls();
+    this._bindEvents();
+    TodoStore.onExternalChange(() => this.refresh());
+    this.refresh();
+  },
+
+  _cacheEls() {
+    const id = (name) => document.getElementById(name);
+    this.els = {
+      inputTitle: id("input-title"),
+      inputDesc: id("input-desc"),
+      inputDue: id("input-due"),
+      inputPriority: id("input-priority"),
+      btnAdd: id("btn-add"),
+      addError: id("add-error"),
+      statTotal: id("stat-total"),
+      statActive: id("stat-active"),
+      statCompleted: id("stat-completed"),
+      filterTabs: document.querySelectorAll(".filter-tab"),
+      searchInput: id("search-input"),
+      btnClear: id("btn-clear"),
+      todoList: id("todo-list"),
+      listStatus: id("list-status"),
+      modalOverlay: id("modal-overlay"),
+      editTitle: id("edit-title"),
+      editDesc: id("edit-desc"),
+      editDue: id("edit-due"),
+      editPriority: id("edit-priority"),
+      editTitleError: id("edit-title-error"),
+      editDescError: id("edit-desc-error"),
+      editDueError: id("edit-due-error"),
+      btnModalCancel: id("btn-modal-cancel"),
+      btnModalSave: id("btn-modal-save"),
+      confirmOverlay: id("confirm-overlay"),
+      confirmMessage: id("confirm-message"),
+      btnConfirmCancel: id("btn-confirm-cancel"),
+      btnConfirmOk: id("btn-confirm-ok"),
+      toast: id("toast"),
+    };
+  },
+
+  _bindEvents() {
+    this.els.btnAdd.addEventListener("click", () => this._createTodo());
+    this.els.inputTitle.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); this._createTodo(); }
+    });
+    this.els.searchInput.addEventListener("input", () => this._onDebouncedSearch());
+    this.els.filterTabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        this.state.filter = tab.dataset.status;
+        this._updateFilterUI();
+        this.refresh();
+      });
+    });
+    this.els.btnClear.addEventListener("click", () => this._confirmClearCompleted());
+    this.els.btnModalCancel.addEventListener("click", () => this._closeEditModal());
+    this.els.btnModalSave.addEventListener("click", () => this._saveEdit());
+    this.els.modalOverlay.addEventListener("click", (e) => {
+      if (e.target === this.els.modalOverlay) this._closeEditModal();
+    });
+    this.els.btnConfirmCancel.addEventListener("click", () => this._closeConfirm());
+    this.els.btnConfirmOk.addEventListener("click", () => {
+      const action = this.state.confirmAction;
+      this._closeConfirm();
+      if (action) action();
+    });
+    this.els.confirmOverlay.addEventListener("click", (e) => {
+      if (e.target === this.els.confirmOverlay) this._closeConfirm();
+    });
+  },
+
+  /* ----- 渲染 ----- */
+  refresh() {
+    const filter = {
+      status: this.state.filter,
+      keyword: this.state.keyword,
+      sort: CONFIG.DEFAULT_SORT,
+    };
+    const result = TodoService.listTodos(filter);
+    if (result.code) { this.showToast(result.message, true); return; }
+    this._renderStats(result.stats);
+    this._renderList(result.todos);
+  },
+
+  _renderStats(stats) {
+    this.els.statTotal.textContent = stats.total;
+    this.els.statActive.textContent = stats.active;
+    this.els.statCompleted.textContent = stats.completed;
+  },
+
+  _renderList(todos) {
+    const list = this.els.todoList;
+    list.textContent = "";
+    if (todos.length === 0) {
+      this.els.listStatus.textContent =
+        this.state.keyword || this.state.filter !== "all"
+          ? "未找到符合条件的任务"
+          : "暂无任务，点击上方输入框添加";
+      return;
+    }
+    this.els.listStatus.textContent = "";
+    todos.forEach((todo) => list.appendChild(this._renderTask(todo)));
+  },
+
+  _renderTask(todo) {
+    const li = document.createElement("li");
+    li.className = "todo-item";
+    if (todo.status === "completed") li.classList.add("completed");
+    if (todo.priority !== "none") li.classList.add("priority-" + todo.priority);
+
+    const main = document.createElement("div");
+    main.className = "todo-main";
+
+    // 一律使用 textContent，防 XSS
+    const title = document.createElement("div");
+    title.className = "todo-title";
+    title.textContent = todo.title;
+    main.appendChild(title);
+
+    if (todo.description) {
+      const desc = document.createElement("div");
+      desc.className = "todo-desc";
+      desc.textContent = todo.description;
+      main.appendChild(desc);
+    }
+
+    const meta = document.createElement("div");
+    meta.className = "todo-meta";
+    meta.appendChild(this._badge(STATUS_LABEL[todo.status] || todo.status, ""));
+    if (todo.priority && todo.priority !== "none") {
+      meta.appendChild(this._badge("优先级 · " + (PRIORITY_LABEL[todo.priority] || todo.priority), "priority"));
+    }
+    if (todo.dueDate) {
+      const overdue = todo.status === "active" && todo.dueDate < ValidationService._today();
+      meta.appendChild(this._badge("截止 " + todo.dueDate, overdue ? "due-overdue" : ""));
+    }
+    if (todo.completedAt) {
+      meta.appendChild(this._badge("完成于 " + String(todo.completedAt).slice(0, 10), ""));
+    }
+    main.appendChild(meta);
+    li.appendChild(main);
+
+    const actions = document.createElement("div");
+    actions.className = "todo-actions";
+    if (todo.status === "active") {
+      actions.appendChild(this._actionBtn("完成", "complete", () => this._toggle(todo.id, "completed")));
+      actions.appendChild(this._actionBtn("编辑", "", () => this._openEditModal(todo.id)));
+    } else {
+      actions.appendChild(this._actionBtn("恢复进行中", "complete", () => this._toggle(todo.id, "active")));
+    }
+    actions.appendChild(this._actionBtn("删除", "delete", () => this._confirmDelete(todo.id, todo.title)));
+    li.appendChild(actions);
+    return li;
+  },
+
+  _badge(text, cls) {
+    const span = document.createElement("span");
+    span.className = "badge" + (cls ? " " + cls : "");
+    span.textContent = text;
+    return span;
+  },
+
+  _actionBtn(text, cls, onClick) {
+    const btn = document.createElement("button");
+    btn.className = "btn-icon" + (cls ? " " + cls : "");
+    btn.type = "button";
+    btn.textContent = text;
+    btn.addEventListener("click", onClick);
+    return btn;
+  },
+
+  /* ----- 新增 ----- */
+  _getInputPayload() {
+    return {
+      title: this.els.inputTitle.value.trim(),
+      description: this.els.inputDesc.value.trim(),
+      dueDate: this.els.inputDue.value || null,
+      priority: this.els.inputPriority.value,
+    };
+  },
+
+  _createTodo() {
+    const payload = this._getInputPayload();
+    const err = ValidationService.validate(payload);
+    if (err) { this.els.addError.textContent = err.message; return; }
+    this.els.addError.textContent = "";
+
+    this.els.btnAdd.disabled = true;
+    const result = TodoService.createTodo(payload);
+    if (result.code) {
+      this.els.addError.textContent = result.message;
+      this.els.btnAdd.disabled = false;
+      return;
+    }
+    this.els.inputTitle.value = "";
+    this.els.inputDesc.value = "";
+    this.els.inputDue.value = "";
+    this.els.inputPriority.value = "none";
+    this.state.filter = "all";
+    this._updateFilterUI();
+    this.refresh();
+    this.showToast("任务已新增");
+    this.els.btnAdd.disabled = false;
+    this.els.inputTitle.focus();
+  },
+
+  /* ----- 筛选与搜索 ----- */
+  _onDebouncedSearch() {
+    clearTimeout(this._searchTimer);
+    this._searchTimer = setTimeout(() => {
+      this.state.keyword = this.els.searchInput.value.trim();
+      this.refresh();
+    }, CONFIG.DEBOUNCE_MS);
+  },
+
+  _updateFilterUI() {
+    this.els.filterTabs.forEach((tab) => {
+      const active = tab.dataset.status === this.state.filter;
+      tab.classList.toggle("active", active);
+      tab.setAttribute("aria-selected", String(active));
+    });
+  },
+
+  /* ----- 状态切换 ----- */
+  _toggle(id, status) {
+    const result = TodoService.toggleStatus(id, status);
+    if (result.code) { this.showToast(result.message, true); }
+    else { this.showToast(status === "completed" ? "任务已完成" : "任务已恢复为进行中"); }
+    this.refresh();
+  },
+
+  /* ----- 编辑 ----- */
+  _openEditModal(id) {
+    this.state.editingId = id;
+    const target = TodoStore.todos.find((t) => t.id === id);
+    if (!target) { this.showToast("任务已被删除，无法保存", true); this.refresh(); return; }
+    this.els.editTitle.value = target.title;
+    this.els.editDesc.value = target.description || "";
+    this.els.editDue.value = target.dueDate || "";
+    this.els.editPriority.value = target.priority || "none";
+    this.els.editTitleError.textContent = "";
+    this.els.editDescError.textContent = "";
+    this.els.editDueError.textContent = "";
+    this.els.modalOverlay.classList.remove("hidden");
+    this.els.editTitle.focus();
+  },
+
+  _closeEditModal() {
+    this.els.modalOverlay.classList.add("hidden");
+    this.state.editingId = null;
+  },
+
+  _saveEdit() {
+    const payload = {
+      title: this.els.editTitle.value.trim(),
+      description: this.els.editDesc.value.trim(),
+      dueDate: this.els.editDue.value || null,
+      priority: this.els.editPriority.value,
+    };
+    const err = ValidationService.validate(payload);
+    this.els.editTitleError.textContent = "";
+    this.els.editDescError.textContent = "";
+    this.els.editDueError.textContent = "";
+    if (err) {
+      const fieldError = document.getElementById(
+        err.code === "40003" ? "edit-desc-error" : err.code === "40004" ? "edit-due-error" : "edit-title-error"
+      );
+      fieldError.textContent = err.message;
+      return;
+    }
+    this.els.btnModalSave.disabled = true;
+    const result = TodoService.updateTodo(this.state.editingId, payload);
+    this.els.btnModalSave.disabled = false;
+    if (result.code) {
+      this.showToast(result.message, true);
+      if (result.code === "40401" || result.code === "40301") this._closeEditModal();
+      this.refresh();
+      return;
+    }
+    this._closeEditModal();
+    this.refresh();
+    this.showToast("任务已保存");
+  },
+
+  /* ----- 删除与清除 ----- */
+  _openConfirm(message, onOk) {
+    this.els.confirmMessage.textContent = message;
+    this.state.confirmAction = onOk;
+    this.els.confirmOverlay.classList.remove("hidden");
+  },
+
+  _closeConfirm() {
+    this.els.confirmOverlay.classList.add("hidden");
+    this.state.confirmAction = null;
+  },
+
+  _confirmDelete(id, taskTitle) {
+    this._openConfirm(`确定删除「${taskTitle}」吗？此操作不可撤销。`, () => {
+      const result = TodoService.removeTodo(id);
+      if (result.code) { this.showToast(result.message, true); }
+      else { this.showToast("任务已删除"); }
+      this.refresh();
+    });
+  },
+
+  _confirmClearCompleted() {
+    this._openConfirm("确定删除全部已完成任务吗？此操作不可撤销。", () => {
+      const result = TodoService.clearCompleted();
+      if (result.code) { this.showToast(result.message, true); }
+      else { this.showToast(`已清除 ${result.removed} 条已完成任务`); }
+      this.refresh();
+    });
+  },
+
+  /* ----- 反馈 ----- */
+  showToast(message, isError = false) {
+    this.els.toast.textContent = message;
+    this.els.toast.classList.toggle("error", isError);
+    this.els.toast.classList.remove("hidden");
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.els.toast.classList.add("hidden"), 2200);
+  },
+};
+
+/* ---------- 启动 ---------- */
+UIController.init();
+
+</script>
+</body>
+</html>
